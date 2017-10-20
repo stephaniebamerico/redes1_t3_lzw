@@ -1,32 +1,49 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#define DEFAULTENTRYSIZE 500
-#define LARGERENTRY 10000
-#define DICSIZE 100000
+//maior demora muito pra alocar
+#define DEFAULTENTRYSIZE 5
+//a partir de alguns valores nao precisa mais aumentar
+#define LARGERENTRY 1000
+//10000 é um tam bom mas demora
+//1000000 é impossível
+#define DICSIZE 10000
+#define DICTYPE 256
 
+int strcomp(unsigned char * a, unsigned char * b)
+{
+    int i =0;
+    while (a[i]!= '\0' && b[i] != '\0')
+    {
+        if (a[i] != b[i])
+            return (1);
+        i++;
+    }
+    if (a[i] != b[i])
+        return 1;
+    return (0);
+}
 
-
-char *dic[DICSIZE*2];
+unsigned char *dic[DICSIZE+2];
 
 int main(int argc, char const *argv[])
 {
-    char p[LARGERENTRY + 1],aux[LARGERENTRY + 1], c;
-    int tam;
+    unsigned char p[LARGERENTRY + 1],aux[LARGERENTRY + 1], c;
+    int tam = 0;
     for (int i = 0; i <= DICSIZE; ++i)
     {
         //aloca a mem inicial
-        dic[i] = malloc (DEFAULTENTRYSIZE*sizeof(char));
+        dic[i] = malloc (DEFAULTENTRYSIZE*sizeof(unsigned char));
         dic[i][0] = '\0';
-        tam = 0;
     }
     p[0]='\0';
+    int k =0;
     //enquanto não é o fim da entrada  
     while (scanf ("%c", &c ) != EOF)
     {
         //aux = p
         strcpy (aux,p);
-        if ((strlen(aux))<LARGERENTRY && tam < DICSIZE)
+        if ((strlen(aux))<LARGERENTRY)
         {
             int isInDic = 0;
             //aux = p + c
@@ -57,48 +74,23 @@ int main(int argc, char const *argv[])
                         if (strcmp(p,dic[i]) == 0)
                         {
                             print = 1;
-                            printf("%d ", i+128);
+                            printf("%d ", i+DICTYPE);
                         }
                 }
                 else 
                 {
                     printf("%d ", (int)p[0]);
                 }
-
-
-                if (strlen (aux) > DEFAULTENTRYSIZE)
-                    dic[tam] = (char *)realloc (dic[tam], strlen (aux)*sizeof(char));
-                strcpy(dic[tam],aux);
-                tam++;
+                if (tam < DICSIZE)
+                {
+                    if (strlen (aux) > DEFAULTENTRYSIZE)
+                        dic[tam] = (unsigned char *)realloc (dic[tam], strlen (aux)*sizeof(unsigned char));
+                    strcpy(dic[tam],aux);
+                    tam++;
+                }
                 p[0] = c;
                 p[1] = '\0';
             }
-        }
-        else if (tam < DICSIZE)
-        {
-            if (strlen (p) > 1) 
-                {
-                    int print = 0;
-                    for (int i = 0; i < tam && !print; ++i)
-                        if (strcmp(p,dic[i]) == 0)
-                        {
-                            print = 1;
-                            printf("%d ", i+128);
-                        }
-                }
-                else 
-                {
-                    printf("%d ", (int)p[0]);
-                }
-
-
-                if (strlen (aux) > DEFAULTENTRYSIZE)
-                    dic[tam] = (char *)realloc (dic[tam], strlen (aux)*sizeof(char));
-                strcpy(dic[tam],aux);
-                tam++;
-                p[0] = c;
-                p[1] = '\0';
-
         }
         else
         {
@@ -109,13 +101,19 @@ int main(int argc, char const *argv[])
                         if (strcmp(p,dic[i]) == 0)
                         {
                             print = 1;
-                            printf("%d ", i+128);
+                            printf("%d ", i+DICTYPE);
                         }
                 }
                 else 
                 {
                     printf("%d ", (int)p[0]);
                 }
+
+
+                if (strlen (aux) > DEFAULTENTRYSIZE)
+                    dic[tam] = (unsigned char *)realloc (dic[tam], strlen (aux)*sizeof(unsigned char));
+                strcpy(dic[tam],aux);
+                tam++;
                 p[0] = c;
                 p[1] = '\0';
 
@@ -130,13 +128,18 @@ int main(int argc, char const *argv[])
             if (strcmp(aux,dic[i]) == 0)
             {
                 print = 1;
-                printf("%d", i+128);
+                printf("%d", i+DICTYPE);
             }
     }
     else 
         printf("%d", (int)p[0]);
       
     printf("\n");
+    for (int i = 0; i <= DICSIZE; ++i)
+    {
+        //aloca a mem inicial
+        free(dic[i]);
+    }
 
 
     return 0;
