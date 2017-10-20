@@ -10,19 +10,6 @@
 #define DICSIZE 10000
 #define DICTYPE 256
 
-int strcomp(unsigned char * a, unsigned char * b)
-{
-    int i =0;
-    while (a[i]!= '\0' && b[i] != '\0')
-    {
-        if (a[i] != b[i])
-            return (1);
-        i++;
-    }
-    if (a[i] != b[i])
-        return 1;
-    return (0);
-}
 
 unsigned char *dic[DICSIZE+2];
 
@@ -74,12 +61,12 @@ int main(int argc, char const *argv[])
                         if (strcmp(p,dic[i]) == 0)
                         {
                             print = 1;
-                            printf("%d ", i+DICTYPE);
+                            printf("%x ", i+DICTYPE);
                         }
                 }
                 else 
                 {
-                    printf("%d ", (int)p[0]);
+                    printf("%x ", (int)p[0]);
                 }
                 if (tam < DICSIZE)
                 {
@@ -101,12 +88,12 @@ int main(int argc, char const *argv[])
                         if (strcmp(p,dic[i]) == 0)
                         {
                             print = 1;
-                            printf("%d ", i+DICTYPE);
+                            printf("%x ", i+DICTYPE);
                         }
                 }
                 else 
                 {
-                    printf("%d ", (int)p[0]);
+                    printf("%x ", (int)p[0]);
                 }
 
 
@@ -128,11 +115,11 @@ int main(int argc, char const *argv[])
             if (strcmp(aux,dic[i]) == 0)
             {
                 print = 1;
-                printf("%d", i+DICTYPE);
+                printf("%x", i+DICTYPE);
             }
     }
     else 
-        printf("%d", (int)p[0]);
+        printf("%x", (int)p[0]);
       
     printf("\n");
     for (int i = 0; i <= DICSIZE; ++i)

@@ -35,3 +35,31 @@
 13       OLD + C to the string table
 14       OLD = NEW
 15   END WHILE
+
+
+
+
+
+
+
+
+Read OLD_CODE
+
+output OLD_CODE
+
+WHILE there are still input characters DO
+
+Read NEW_CODE
+
+STRING = get translation of NEW_CODE
+
+output STRING
+
+CHARACTER = first character in STRING
+
+add OLD_CODE + CHARACTER to the translation table
+
+OLD_CODE = NEW_CODE
+
+END of WHILE
+
