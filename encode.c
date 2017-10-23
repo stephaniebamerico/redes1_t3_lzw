@@ -1,68 +1,144 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include "lzwData.h"
 //maior demora muito pra alocar
 #define DEFAULTENTRYSIZE 5
+#define DEFAULTCOLLISION 10
 //a partir de alguns valores nao precisa mais aumentar
 #define LARGERENTRY 1000
 //10000 é um tam bom mas demora
 //1000000 é impossível
-#define DICSIZE 10000
+#define DICSIZE 100000
 #define DICTYPE 256
 
 
-unsigned char *dic[DICSIZE+2];
+lzw_t **dic[DICSIZE+2];
+int collisions[DICSIZE+2];
+int *output;
+
+int findPosition(char *a)
+{
+    
+    unsigned long soma = 0;
+    for (int i = 0; a[i] != '\0'; ++i)
+    {
+
+        soma+=a[i];
+    }
+    soma%=DICSIZE;
+    
+    int i;
+    for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0' && strcmp(dic[soma][i]->entry,a); ++i);
+        
+    if (i < collisions[soma] && !strcmp(dic[soma][i]->entry,a))
+    {
+        
+        return dic[soma][i]->position;
+    }
+    return -1;
+}
+
+void updadeDic(char *a, int pos)
+{
+    
+    unsigned long soma = 0;
+    for (int i = 0; a[i] != '\0'; ++i)
+        soma+=a[i];
+    soma%=DICSIZE;
+    int i;
+    for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0'; ++i)
+    {
+    }
+
+    if (i == collisions[soma])
+    {
+
+        dic[soma] =  realloc (dic[soma],2*collisions[soma]*sizeof(lzw_t));
+        for (int j = collisions[soma]; j < 2*collisions[soma]; ++j)
+        {
+            dic[soma][j] = malloc(sizeof(lzw_t));
+            dic[soma][j]->entry = malloc (DEFAULTENTRYSIZE * sizeof (char));
+            dic[soma][j]->entry[0] = '\0';
+        }
+        
+        collisions[soma]=2*collisions[soma];
+    }
+    int len;
+    if (len = strlen(a) > LARGERENTRY)
+    {
+        dic[soma][collisions[soma]]->entry = realloc(dic[soma][collisions[soma]]->entry, len*sizeof(char));
+
+    }
+    strcpy(dic[soma][i]->entry, a);
+
+    dic[soma][i]->position = pos;
+
+}
 
 int main(int argc, char const *argv[])
 {
     unsigned char p[LARGERENTRY + 1],aux[LARGERENTRY + 1], c;
-    int tam = 0;
+    int tam = 0, pos;
     for (int i = 0; i <= DICSIZE; ++i)
     {
         //aloca a mem inicial
-        dic[i] = malloc (DEFAULTENTRYSIZE*sizeof(unsigned char));
-        dic[i][0] = '\0';
+        dic[i] = malloc (DEFAULTCOLLISION*sizeof(lzw_t)*2);
+        collisions[i] = 5;
+        for (int j = 0; j < DEFAULTCOLLISION; ++j)
+        {
+            dic[i][j] = malloc(sizeof(lzw_t));
+            dic[i][j]->entry = malloc (DEFAULTENTRYSIZE * sizeof (char));
+            dic[i][j]->entry[0] = '\0';
+        }
     }
+    output = malloc (DICSIZE * sizeof (int));
+    int outSize = DICSIZE;
     p[0]='\0';
     int k =0;
+    aux[0] = '\0';
     //enquanto não é o fim da entrada  
     while (scanf ("%c", &c ) != EOF)
     {
+        
         //aux = p
         strcpy (aux,p);
         if ((strlen(aux))<LARGERENTRY)
         {
+            
             int isInDic = 0;
             //aux = p + c
             int len = (strlen(aux));
             aux[len+1] = '\0';
             aux[len] = c;
             if (strlen (aux) > 1)
-                for (int i = 0; i < tam && !isInDic; ++i)
+            {
+                
+                if (findPosition(aux) != -1)
                 {
-                    if (strcmp(aux,dic[i]) == 0)
-                        isInDic = 1;
+                    isInDic = 1;
                 }
+            }
+
             else
+            {
                 isInDic = 1;
+            }
             // p + c está no dicionátio
             if (isInDic)
-            {
+            {  
+
                 //p = p + c
                 strcpy (p,aux);
             }
             else
             {
+
                 //imprime P
-                int print = 0;
                 if (strlen (p) > 1) 
                 {
-                    for (int i = 0; i < tam && !print; ++i)
-                        if (strcmp(p,dic[i]) == 0)
-                        {
-                            print = 1;
-                            printf("%x ", i+DICTYPE);
-                        }
+                    pos = findPosition(p);
+                    printf("%x ",pos + DICTYPE);
                 }
                 else 
                 {
@@ -70,9 +146,7 @@ int main(int argc, char const *argv[])
                 }
                 if (tam < DICSIZE)
                 {
-                    if (strlen (aux) > DEFAULTENTRYSIZE)
-                        dic[tam] = (unsigned char *)realloc (dic[tam], strlen (aux)*sizeof(unsigned char));
-                    strcpy(dic[tam],aux);
+                    updadeDic(aux, tam);
                     tam++;
                 }
                 p[0] = c;
@@ -83,13 +157,8 @@ int main(int argc, char const *argv[])
         {
             if (strlen (p) > 1) 
                 {
-                    int print = 0;
-                    for (int i = 0; i < tam && !print; ++i)
-                        if (strcmp(p,dic[i]) == 0)
-                        {
-                            print = 1;
-                            printf("%x ", i+DICTYPE);
-                        }
+                    pos = findPosition(p);
+                    printf("%x ",pos + DICTYPE);
                 }
                 else 
                 {
@@ -97,10 +166,11 @@ int main(int argc, char const *argv[])
                 }
 
 
-                if (strlen (aux) > DEFAULTENTRYSIZE)
-                    dic[tam] = (unsigned char *)realloc (dic[tam], strlen (aux)*sizeof(unsigned char));
-                strcpy(dic[tam],aux);
-                tam++;
+                if (tam < DICSIZE)
+                {
+                    updadeDic(aux, tam);
+                    tam++;
+                }
                 p[0] = c;
                 p[1] = '\0';
 
@@ -110,18 +180,14 @@ int main(int argc, char const *argv[])
 
     if (strlen (p) > 1) 
     {
-        int print = 0;
-        for (int i = 0; i < tam && !print; ++i)
-            if (strcmp(aux,dic[i]) == 0)
-            {
-                print = 1;
-                printf("%x", i+DICTYPE);
-            }
+
+        pos = findPosition(p);
+        printf("%x ",pos + DICTYPE);
     }
     else 
         printf("%x", (int)p[0]);
       
-    printf("\n");
+   
     for (int i = 0; i <= DICSIZE; ++i)
     {
         //aloca a mem inicial

@@ -6,7 +6,7 @@
 
 #define DICTYPE 256
 
-#define DICSIZE 10000
+#define DICSIZE 100000
 
 
 char *dic[DICSIZE+100];
@@ -23,7 +23,7 @@ int main(int argc, char const *argv[])
         dic[i] = malloc ((LARGERENTRY+2)*sizeof(unsigned char));
         dic[i][0] = '\0';
     }
-
+    
     aux[0]='\0';
     scanf ("%x", &old);
     printf("%c",old);
