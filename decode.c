@@ -10,6 +10,7 @@
 
 
 char *dic[DICSIZE+100];
+int *input;
 
 int main(int argc, char const *argv[])
 {
@@ -23,12 +24,28 @@ int main(int argc, char const *argv[])
         dic[i] = malloc ((LARGERENTRY+2)*sizeof(unsigned char));
         dic[i][0] = '\0';
     }
+
+
+    FILE *fp, *faux;
+    int x;
+
+    fp = fopen( "compressed" , "r" );
+    faux = fopen( "tmp", "r");
+    fscanf(faux,"%d",&x );
+    input = malloc (x * sizeof (int));
+    fread(input , x , sizeof(int) , fp );
     
     aux[0]='\0';
-    scanf ("%x", &old);
+    old = input[0];
     printf("%c",old);
-    while (scanf ("%x", &new) != EOF)
+
+
+
+    int in = 1;
+    while (in < x)
     {
+        new = input[in];
+        in++;
         //new is not on the dictionary
         if (tam <= new - DICTYPE)
         {

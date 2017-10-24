@@ -97,10 +97,15 @@ int main(int argc, char const *argv[])
     p[0]='\0';
     int k =0;
     aux[0] = '\0';
+    int x = 0;
     //enquanto não é o fim da entrada  
     while (scanf ("%c", &c ) != EOF)
     {
-        
+        if (x >= outSize-1)
+        {
+            outSize = outSize*2;
+            output = realloc (output, outSize*sizeof(int));
+        }
         //aux = p
         strcpy (aux,p);
         if ((strlen(aux))<LARGERENTRY)
@@ -137,12 +142,14 @@ int main(int argc, char const *argv[])
                 //imprime P
                 if (strlen (p) > 1) 
                 {
-                    pos = findPosition(p);
-                    printf("%x ",pos + DICTYPE);
+                    pos = findPosition(p);            
+                    output[x] = pos + DICTYPE;
+                    x++;
                 }
                 else 
-                {
-                    printf("%x ", (int)p[0]);
+                {                    
+                    output[x] = (int)p[0];
+                    x++;
                 }
                 if (tam < DICSIZE)
                 {
@@ -157,12 +164,14 @@ int main(int argc, char const *argv[])
         {
             if (strlen (p) > 1) 
                 {
-                    pos = findPosition(p);
-                    printf("%x ",pos + DICTYPE);
+                    pos = findPosition(p);            
+                    output[x] = pos + DICTYPE;
+                    x++;
                 }
                 else 
-                {
-                    printf("%x ", (int)p[0]);
+                {                    
+                    output[x] = (int)p[0];
+                    x++;
                 }
 
 
@@ -182,12 +191,22 @@ int main(int argc, char const *argv[])
     {
 
         pos = findPosition(p);
-        printf("%x ",pos + DICTYPE);
+        output[x] = pos + DICTYPE;
+        x++;
     }
-    else 
-        printf("%x", (int)p[0]);
+    else
+    {        
+        output[x] = (int)p[0];
+        x++;
+    }
       
-   
+    FILE *fp, *faux;
+
+    fp = fopen( "compressed" , "w" );
+    faux = fopen( "tmp", "w");
+    fprintf(faux,"%d\n",x );
+
+    fwrite(output , x , sizeof(int) , fp );
     for (int i = 0; i <= DICSIZE; ++i)
     {
         //aloca a mem inicial
