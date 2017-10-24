@@ -6,15 +6,15 @@
 #define DEFAULTENTRYSIZE 5
 #define DEFAULTCOLLISION 10
 //a partir de alguns valores nao precisa mais aumentar
-#define LARGERENTRY 1000
+#define LARGERENTRY 4096
 //10000 é um tam bom mas demora
 //1000000 é impossível
 #define DICSIZE 100000
 #define DICTYPE 256
 
 
-lzw_t **dic[DICSIZE+2];
-int collisions[DICSIZE+2];
+lzw_t **dic[LARGERENTRY+2];
+int collisions[LARGERENTRY+2];
 int *output;
 
 int findPosition(char *a)
@@ -26,7 +26,7 @@ int findPosition(char *a)
 
         soma+=a[i];
     }
-    soma%=DICSIZE;
+    soma%=LARGERENTRY;
     
     int i;
     for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0' && strcmp(dic[soma][i]->entry,a); ++i);
@@ -45,7 +45,7 @@ void updadeDic(char *a, int pos)
     unsigned long soma = 0;
     for (int i = 0; a[i] != '\0'; ++i)
         soma+=a[i];
-    soma%=DICSIZE;
+    soma%=LARGERENTRY;
     int i;
     for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0'; ++i)
     {
@@ -80,7 +80,7 @@ int main(int argc, char const *argv[])
 {
     unsigned char p[LARGERENTRY + 1],aux[LARGERENTRY + 1], c;
     int tam = 0, pos;
-    for (int i = 0; i <= DICSIZE; ++i)
+    for (int i = 0; i <= LARGERENTRY; ++i)
     {
         //aloca a mem inicial
         dic[i] = malloc (DEFAULTCOLLISION*sizeof(lzw_t)*2);
@@ -92,8 +92,8 @@ int main(int argc, char const *argv[])
             dic[i][j]->entry[0] = '\0';
         }
     }
-    output = malloc (DICSIZE * sizeof (int));
-    int outSize = DICSIZE;
+    output = malloc (LARGERENTRY * sizeof (int));
+    int outSize = LARGERENTRY;
     p[0]='\0';
     int k =0;
     aux[0] = '\0';
@@ -207,7 +207,7 @@ int main(int argc, char const *argv[])
     fprintf(faux,"%d\n",x );
 
     fwrite(output , x , sizeof(int) , fp );
-    for (int i = 0; i <= DICSIZE; ++i)
+    for (int i = 0; i <= LARGERENTRY; ++i)
     {
         //aloca a mem inicial
         free(dic[i]);
