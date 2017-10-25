@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include "lzwData.h"
 //maior demora muito pra alocar
 #define DEFAULTENTRYSIZE 5
 #define DEFAULTCOLLISION 10
@@ -12,6 +11,11 @@
 #define DICSIZE 100000
 #define DICTYPE 256
 
+typedef struct lzw_t
+{
+    char* entry;
+    int position;
+}lzw_t;
 
 lzw_t **dic[LARGERENTRY+2];
 int collisions[LARGERENTRY+2];
