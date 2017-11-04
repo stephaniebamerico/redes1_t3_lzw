@@ -1,36 +1,29 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-//maior demora muito pra alocar
-#define DEFAULTENTRYSIZE 5
-#define DEFAULTCOLLISION 10
-//a partir de alguns valores nao precisa mais aumentar
-#define LARGERENTRY 4096
-//10000 é um tam bom mas demora
-//1000000 é impossível
-#define DICSIZE 100000
-#define DICTYPE 256
+#include "lzwData.h"
 
-typedef struct lzw_t
-{
-    char* entry;
-    int position;
-}lzw_t;
 
 lzw_t **dic[LARGERENTRY+2];
 int collisions[LARGERENTRY+2];
 int *output;
 
+unsigned long hashstring(unsigned char *str)
+{
+    unsigned long hash = 5381;
+    int c;
+
+    while (c = *str++)
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash%LARGERENTRY;
+}
+
 int findPosition(char *a)
 {
     
     unsigned long soma = 0;
-    for (int i = 0; a[i] != '\0'; ++i)
-    {
-
-        soma+=a[i];
-    }
-    soma%=LARGERENTRY;
+    soma = hashstring (a);
     
     int i;
     for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0' && strcmp(dic[soma][i]->entry,a); ++i);
@@ -49,7 +42,7 @@ void updadeDic(char *a, int pos)
     unsigned long soma = 0;
     for (int i = 0; a[i] != '\0'; ++i)
         soma+=a[i];
-    soma%=LARGERENTRY;
+    soma = hashstring (a);
     int i;
     for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0'; ++i)
     {
@@ -88,7 +81,7 @@ int main(int argc, char const *argv[])
     {
         //aloca a mem inicial
         dic[i] = malloc (DEFAULTCOLLISION*sizeof(lzw_t)*2);
-        collisions[i] = 5;
+        collisions[i] = DEFAULTCOLLISION;
         for (int j = 0; j < DEFAULTCOLLISION; ++j)
         {
             dic[i][j] = malloc(sizeof(lzw_t));
@@ -155,7 +148,7 @@ int main(int argc, char const *argv[])
                     output[x] = (int)p[0];
                     x++;
                 }
-                if (tam < DICSIZE)
+                if (tam < MAXINPUT)
                 {
                     updadeDic(aux, tam);
                     tam++;
@@ -179,7 +172,7 @@ int main(int argc, char const *argv[])
                 }
 
 
-                if (tam < DICSIZE)
+                if (tam < MAXINPUT)
                 {
                     updadeDic(aux, tam);
                     tam++;
@@ -216,7 +209,6 @@ int main(int argc, char const *argv[])
         //aloca a mem inicial
         free(dic[i]);
     }
-
 
     return 0;
 }

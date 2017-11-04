@@ -1,15 +1,12 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-
-#define LARGERENTRY 1000
-
-#define DICTYPE 256
-
-#define DICSIZE 100000
+#include "lzwData.h"
 
 
-char *dic[DICSIZE+100];
+
+
+char *dic[MAXINPUT+100];
 int *input;
 
 int main(int argc, char const *argv[])
@@ -18,7 +15,7 @@ int main(int argc, char const *argv[])
     int old, new, tam = 0, len;
     char s[LARGERENTRY+3], aux[LARGERENTRY+3],c = '\0';
 
-    for (int i = 0; i <= DICSIZE; ++i)
+    for (int i = 0; i <= MAXINPUT; ++i)
     {
         //aloca a mem inicial
         dic[i] = malloc ((LARGERENTRY+2)*sizeof(unsigned char));
@@ -84,7 +81,7 @@ int main(int argc, char const *argv[])
             aux[0] = (char)old;
             aux[1] = '\0';
         }
-        if (tam < DICSIZE)
+        if (tam < MAXINPUT)
         {
             len = strlen(aux);
             aux[len] = c;
