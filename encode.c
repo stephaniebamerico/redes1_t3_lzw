@@ -198,10 +198,11 @@ int main(int argc, char const *argv[])
     }
       
     FILE *fp, *faux;
-
-    fp = fopen( "compressed" , "w" );
-    faux = fopen( "tmp", "w");
-    fprintf(faux,"%d\n",x );
+    if (argc > 1)   
+        fp = fopen( argv[1] , "w" );
+    else
+        fp = fopen( "compressed" , "w" );
+    fprintf(fp,"%10d\n",x );
 
     fwrite(output , x , sizeof(int) , fp );
     for (int i = 0; i <= LARGERENTRY; ++i)

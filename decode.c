@@ -26,9 +26,12 @@ int main(int argc, char const *argv[])
     FILE *fp, *faux;
     int x;
 
-    fp = fopen( "compressed" , "r" );
-    faux = fopen( "tmp", "r");
-    fscanf(faux,"%d",&x );
+    if (argc > 1)   
+        fp = fopen( argv[1] , "r" );
+    else
+        fp = fopen( "compressed" , "r" );
+    fscanf(fp,"%d",&x );
+    fseek(fp,11,SEEK_SET );
     input = malloc (x * sizeof (int));
     fread(input , x , sizeof(int) , fp );
     
