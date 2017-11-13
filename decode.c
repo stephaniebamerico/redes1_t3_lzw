@@ -98,6 +98,7 @@ int main(int argc, char const *argv[])
     //libera memória
     for (int i = 0; i <= MAXINPUT; ++i)
         free(dic[i]);
+    free (input);
 
     return 0;
 }
