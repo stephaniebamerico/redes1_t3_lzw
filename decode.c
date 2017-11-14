@@ -6,7 +6,7 @@
 
 
 
-char *dic[MAXINPUT+100];
+char *dic[MAXINPUT+DICTYPE+1];
 int *input;
 
 int main(int argc, char const *argv[])
@@ -45,6 +45,14 @@ int main(int argc, char const *argv[])
     {
         new = input[in];
         in++;
+
+        if (new > MAXINPUT + DICTYPE)
+        {
+            printf("%d\n",new );
+            printf("%d\n",MAXINPUT );
+            fprintf(stderr,"ERRO NA DESCOMPRESSÃO\n");
+            return -1;
+        }
         //new não está no dicionário
         if (tam <= new - DICTYPE)
         {
