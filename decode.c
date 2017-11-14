@@ -11,7 +11,6 @@ int *input;
 
 int main(int argc, char const *argv[])
 {
-    setvbuf (stdout, 0, _IONBF, 0) ;
     int old, new, tam = 0, len;
     char s[LARGERENTRY+3], aux[LARGERENTRY+3],c = '\0';
 
@@ -24,6 +23,7 @@ int main(int argc, char const *argv[])
 
 
     FILE *fp;
+    //tamanho do vetor input
     int x;
 
     if (argc > 1) fp = fopen( argv[1] , "r" );
@@ -39,13 +39,13 @@ int main(int argc, char const *argv[])
     printf("%c",old);
 
 
-
+    //variável que percorre o vetor input
     int in = 1;
     while (in < x)
     {
         new = input[in];
         in++;
-        //new is not on the dictionary
+        //new não está no dicionário
         if (tam <= new - DICTYPE)
         {
             // s = old
@@ -62,6 +62,7 @@ int main(int argc, char const *argv[])
             s[len] = c;
             s[len+1] = '\0';
         }
+        //new está no dicionário
         else
         {
             // s = new

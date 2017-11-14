@@ -22,16 +22,16 @@ unsigned long hashstring(unsigned char *str)
 int findPosition(char *a)
 {
     
-    unsigned long soma = 0;
-    soma = hashstring (a);
+    unsigned long hash = 0;
+    hash = hashstring (a);
     
     int i;
-    for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0' && strcmp(dic[soma][i]->entry,a); ++i);
+    for (i = 0; i < collisions[hash] && dic[hash][i]->entry[0] != '\0' && strcmp(dic[hash][i]->entry,a); ++i);
         
-    if (i < collisions[soma] && !strcmp(dic[soma][i]->entry,a))
+    if (i < collisions[hash] && !strcmp(dic[hash][i]->entry,a))
     {
         
-        return dic[soma][i]->position;
+        return dic[hash][i]->position;
     }
     return -1;
 }
@@ -39,37 +39,32 @@ int findPosition(char *a)
 void updadeDic(char *a, int pos)
 {
     
-    unsigned long soma = 0;
+    unsigned long hash = 0;
     for (int i = 0; a[i] != '\0'; ++i)
-        soma+=a[i];
-    soma = hashstring (a);
+        hash+=a[i];
+    hash = hashstring (a);
     int i;
-    for (i = 0; i < collisions[soma] && dic[soma][i]->entry[0] != '\0'; ++i)
-    {
-    }
+    for (i = 0; i < collisions[hash] && dic[hash][i]->entry[0] != '\0'; ++i);
 
-    if (i == collisions[soma])
+    if (i == collisions[hash])
     {
 
-        dic[soma] =  realloc (dic[soma],2*collisions[soma]*sizeof(lzw_t));
-        for (int j = collisions[soma]; j < 2*collisions[soma]; ++j)
+        dic[hash] =  realloc (dic[hash],2*collisions[hash]*sizeof(lzw_t));
+        for (int j = collisions[hash]; j < 2*collisions[hash]; ++j)
         {
-            dic[soma][j] = malloc(sizeof(lzw_t));
-            dic[soma][j]->entry = malloc (DEFAULTENTRYSIZE * sizeof (char));
-            dic[soma][j]->entry[0] = '\0';
+            dic[hash][j] = malloc(sizeof(lzw_t));
+            dic[hash][j]->entry = malloc (DEFAULTENTRYSIZE * sizeof (char));
+            dic[hash][j]->entry[0] = '\0';
         }
         
-        collisions[soma]=2*collisions[soma];
+        collisions[hash]=2*collisions[hash];
     }
     int len;
     if (len = strlen(a) > LARGERENTRY)
-    {
-        dic[soma][collisions[soma]]->entry = realloc(dic[soma][collisions[soma]]->entry, len*sizeof(char));
+        dic[hash][collisions[hash]]->entry = realloc(dic[hash][collisions[hash]]->entry, len*sizeof(char));
+    strcpy(dic[hash][i]->entry, a);
 
-    }
-    strcpy(dic[soma][i]->entry, a);
-
-    dic[soma][i]->position = pos;
+    dic[hash][i]->position = pos;
 
 }
 
@@ -90,14 +85,16 @@ int main(int argc, char const *argv[])
         }
     }
     output = malloc (LARGERENTRY * sizeof (int));
+    //tamanho do vetor outsize
     int outSize = LARGERENTRY;
     p[0]='\0';
-    int k =0;
     aux[0] = '\0';
+    //posições ocupadas no vetor output
     int x = 0;
     //enquanto não é o fim da entrada  
     while (scanf ("%c", &c ) != EOF)
     {
+    	//se não tem mais posições livre em outsize, realoca a memória
         if (x >= outSize-1)
         {
             outSize = outSize*2;
@@ -105,10 +102,12 @@ int main(int argc, char const *argv[])
         }
         //aux = p
         strcpy (aux,p);
+        //se aux tem menos chars que LARGERENTRY
         if ((strlen(aux))<LARGERENTRY)
         {
             
             int isInDic = 0;
+
             //aux = p + c
             int len = (strlen(aux));
             aux[len+1] = '\0';
@@ -117,26 +116,19 @@ int main(int argc, char const *argv[])
             {
                 
                 if (findPosition(aux) != -1)
-                {
                     isInDic = 1;
-                }
             }
 
             else
-            {
                 isInDic = 1;
-            }
             // p + c está no dicionátio
             if (isInDic)
-            {  
 
                 //p = p + c
                 strcpy (p,aux);
-            }
+            //p + c não está no dicionário
             else
             {
-
-                //imprime P
                 if (strlen (p) > 1) 
                 {
                     pos = findPosition(p);            
@@ -148,6 +140,7 @@ int main(int argc, char const *argv[])
                     output[x] = (int)p[0];
                     x++;
                 }
+                //só atualiza o dicionário se ele tem menos de MAXINPUT entradas
                 if (tam < MAXINPUT)
                 {
                     updadeDic(aux, tam);
@@ -157,28 +150,22 @@ int main(int argc, char const *argv[])
                 p[1] = '\0';
             }
         }
+        //se aux tem chars >= LARGERENTRY, não coloca no dicionário
         else
         {
             if (strlen (p) > 1) 
-                {
-                    pos = findPosition(p);            
-                    output[x] = pos + DICTYPE;
-                    x++;
-                }
-                else 
-                {                    
-                    output[x] = (int)p[0];
-                    x++;
-                }
-
-
-                if (tam < MAXINPUT)
-                {
-                    updadeDic(aux, tam);
-                    tam++;
-                }
-                p[0] = c;
-                p[1] = '\0';
+            {
+                pos = findPosition(p);            
+                output[x] = pos + DICTYPE;
+                x++;
+            }
+            else 
+            {                    
+                output[x] = (int)p[0];
+                x++;
+            }
+            p[0] = c;
+            p[1] = '\0';
 
         }
 
@@ -197,7 +184,7 @@ int main(int argc, char const *argv[])
         x++;
     }
       
-    FILE *fp, *faux;
+    FILE *fp;
     if (argc > 1)   
         fp = fopen( argv[1] , "w" );
     else
